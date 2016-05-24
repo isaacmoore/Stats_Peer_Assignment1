@@ -1,0 +1,72 @@
+---
+title: "Part 2"
+author: "Isaac Moore"
+date: "May 17, 2016"
+output: pdf_document
+---
+In this analysis we will look at the "ToothGrowth" dataset which is "The Effect of Vitamin C on Tooth Growth in Guinea Pigs"  
+Initialize libraries into R.
+```{r setup, include=TRUE, echo=TRUE}
+library('dplyr')
+library('ggplot2')
+```
+
+### Number 1  
+**Load the data into R**
+```{r}
+data('ToothGrowth')
+tooth_growth <- tbl_df(ToothGrowth)
+tooth_growth
+```
+### Number 2  
+**Exploratory data analysis and summary of the data**  
+60 guinea pigs were doses of vitamin C in one of three doeses - 0.5mg, 1mg, or 2mg / day. There were two delivery methods orange juice (coded as 'OJ') or asorbic acid(coded as 'VC').
+```{r}
+oj <- tooth_growth %>% filter(tooth_growth$supp == 'OJ')
+summary(oj$len)
+vc <- tooth_growth %>% filter(tooth_growth$supp == 'VC')
+summary(vc$len)
+```
+We can see based off of the means of both summaries that OJ yileds greater results.  
+Next, Lets take a look at the mean for OJ and VC at each dose.  
+*Orange Juice (OJ)*
+```{r}
+oj_dose_lens <- tooth_growth %>% filter(tooth_growth$supp == 'OJ') %>%
+        group_by(dose) %>%
+        summarise(oj_mean_len = mean(len))
+oj_dose_lens
+```
+*Asorbic Acid (VC)*
+```{r}
+vc_dose_lens <- tooth_growth %>% filter(tooth_growth$supp == 'VC') %>%
+        group_by(dose) %>%
+        summarise(vc_mean_len = mean(len))
+vc_dose_lens
+```
+*Plot showing the data*
+```{r}
+plot <- ggplot(tooth_growth, aes(supp, len))+geom_point()
+plot + facet_grid(.~dose)+
+        labs(title='Supplements at each dose', y='Tooth Length',x='Supplement')
+```
+
+We can see from the analysis performed above that at doses 0.5mg and 1mg orange juice outperforms asorbic acid, but asorbic outperforms orange juice at 2mg, but is more disperse.   
+
+### Number 3
+**Welch Two Sample t-test**  
+t-test for orange juice and asorbic acid.
+```{r}
+t.test(oj$len, vc$len, paired = FALSE, var.equal = FALSE)
+```
+*Testing the disperse 2mg dose.*  
+Initalize the data to perform the test.
+```{r}
+oj_2 <- filter(tooth_growth, dose == 2.0)
+oj_2 <- filter(oj_2, supp == "OJ")
+vc_2 <- filter(tooth_growth, dose == 2.0)
+vc_2 <- filter(vc_2, supp == "VC")
+```
+t-test
+```{r}
+t.test(oj_2$len, vc_2$len, paired = FALSE, var.equal = FALSE)
+```

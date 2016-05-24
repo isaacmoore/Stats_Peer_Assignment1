@@ -1,0 +1,62 @@
+---
+title: "Part 1"
+author: "Isaac Moore"
+date: "May 17, 2016"
+output: html_document
+---
+### Number 1
+In part one we will examine the Central Limit Therom (CLT) by simulating 1000 means of 40 random exponentials using the ```{r} rexp() ``` command.  
+**Initalize the data to be used for the analysis.**
+```{r setup, include=TRUE, echo=TRUE}
+set.seed(1987)
+lambda <- 0.2
+sd <- 1/lambda
+sims <- 1000
+n <- 40
+data <- NULL
+```
+**Comparing the theoretical mean to the actual mean of the simulated data.**
+```{r}
+for(i in 1 : sims){
+data <- c(data, mean(rexp(n, lambda)))
+}
+theoretical_mean <- 1/lambda 
+theoretical_mean
+actual_mean <- mean(data)
+actual_mean
+```
+
+We can see there is a difference of 0.006829905 between the theoretical mean and the actual mean.  
+**Plotting the data**
+```{r}
+hist(data, breaks = 'Sturges')
+abline (v = theoretical_mean, col = 'red')
+abline(v = actual_mean, col = 'green')
+legend('topright', pch = 19, col = c('red', 'green'), legend = c('Theoretical Mean', 'Actual Mean'))
+```
+
+We can see that the actual mean mean is very close to the theoretical mean - the number of simulations we increase, closer the actual mean will get to the theoretical mean.  
+
+### Number 2  
+**Comparing the variance of the actual simulated data to the theoretical variance.**  
+```{r}
+actual_std_dev <- sd(data)
+actual_variance <- actual_std_dev^2
+actual_variance
+theoretical_std_dev <- (1/lambda)/sqrt(n)
+theoretical_variance <- theoretical_std_dev^2
+theoretical_variance
+```
+We can see that there is a large difference between the theoretical variance and the actual variance - 0.02252434  
+
+### Number 3  
+**Comparing the simulated distribution to the normal distribution.**  
+```{r}
+xfit <- seq(min(data), max(data), length=1000)
+yfit <- dnorm(xfit, mean=1/lambda, sd=(1/lambda)/sqrt(n))
+hist(data, breaks = 'Sturges', probability = T)
+lines(xfit, yfit, type ='l', lwd = 1, col = 'red')
+legend('topright', pch = 19, col = c('red'), legend = c('Normal Distribution'))
+```
+
+We can see that the distribution is very close to being normally distributed. The number of simulations we increase, the closer the distribution will get to being normally distributted. 
